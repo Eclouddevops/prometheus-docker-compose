@@ -2,7 +2,7 @@ version: '3'
 
 services:
   fastapi-app:
-    image: eclouddevops/opentelemetry-fastapi:latest
+    image: prometheus-docker-compose/fastapi-collection.json:latest
     ports:
       - "8000:8000"  # Assuming your FastAPI app runs on port 8000
     networks:
