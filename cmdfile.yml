@@ -1,0 +1,10 @@
+ssh-keygen -t ed25519 -C "eclouddevops@gmail.com"
+docker stop $(docker ps -q) && docker rm $(docker ps -a -q) && docker image prune -a -f
+docker stop $(docker ps -q)
+# Stop all running containers if any
+docker ps -q | xargs -r docker stop
+# Remove all containers if any
+ docker ps -a -q | xargs -r docker rm
+# Remove all unused images
+ docker image prune -a -f
+ docker compose up
