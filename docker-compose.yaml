@@ -2,7 +2,7 @@ version: '3'
 
 services:
   fastapi-app:
-    image: rslim087/fastapi-prometheus:latest
+    image: eclouddevops/opentelemetry-fastapi:latest
     ports:
       - "8000:8000"  # Assuming your FastAPI app runs on port 8000
     networks:
