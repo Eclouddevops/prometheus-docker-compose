@@ -2,7 +2,7 @@ version: '3'
 
 services:
   fastapi-app:
-    image: prometheus-docker-compose/fastapi-collection.json:latest
+    image: prometheus-docker-compose/fastapi-collection.json
     ports:
       - "8000:8000"  # Assuming your FastAPI app runs on port 8000
     networks:
