@@ -1,13 +1,12 @@
+version: '3'
+
 services:
   fastapi-app:
-    build: ./fastapi-app 
-    container_name: fastapi-app
+    image: prometheus-docker-compose/fastapi-collection.json
     ports:
-      - "8000:8000"
+      - "8000:8000"  # Assuming your FastAPI app runs on port 8000
     networks:
       - monitoring
-    volumes:
-      - ./fastapi-collection.json:/app/fastapi-collection.json  # Mount JSON if needed
 
   prometheus:
     image: prom/prometheus:v2.37.0
