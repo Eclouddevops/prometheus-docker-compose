@@ -1,6 +1,7 @@
 services:
   fastapi-app:
-    build: .  # Build the local Dockerfile
+    build: ./fastapi-app 
+    container_name: fastapi-app
     ports:
       - "8000:8000"
     networks:
