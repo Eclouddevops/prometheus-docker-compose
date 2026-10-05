@@ -1,0 +1,61 @@
+name: Validate AMP Configurations
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-prometheus:
+    name: Validate Prometheus Configs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install promtool
+        run: |
+          PROM_VERSION="2.47.0"
+          wget -q "https://github.com/prometheus/prometheus/releases/download/v${PROM_VERSION}/prometheus-${PROM_VERSION}.linux-amd64.tar.gz"
+          tar -xzf "prometheus-${PROM_VERSION}.linux-amd64.tar.gz"
+          sudo mv "prometheus-${PROM_VERSION}.linux-amd64/promtool" /usr/local/bin/
+
+      - name: Validate alert rules
+        run: |
+          echo "Validating common rules..."
+          promtool check rules prometheus/rules/common/*.yaml
+          echo "Validating prod rules..."
+          promtool check rules prometheus/rules/prod/*.yaml
+          echo "Validating nonprod rules..."
+          promtool check rules prometheus/rules/nonprod/*.yaml
+          echo "✅ All rules valid"
+
+  validate-terraform:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Terraform Init & Validate (central-account)
+        run: |
+          cd terraform/central-account
+          terraform init -backend=false
+          terraform validate
+
+      - name: Terraform Fmt Check
+        run: terraform fmt -check -recursive terraform/
+
+  validate-yaml:
+    name: Validate YAML Files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate YAML syntax
+        run: |
+          pip install yamllint -q
+          yamllint prometheus/ kubernetes/ grafana/ workspaces/ -d relaxed
+          echo "✅ All YAML files valid"

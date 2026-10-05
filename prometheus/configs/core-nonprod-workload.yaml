@@ -1,0 +1,49 @@
+# Prometheus config for: core-nonprod-workload (228227093546)
+# Region: us-east-1 | Environment: Non-Production
+
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+  external_labels:
+    account_id: "228227093546"
+    account_name: "core-nonprod-workload"
+    environment: "nonprod"
+    region: "us-east-1"
+    team: "core"
+    cluster: "core-nonprod-workload-eks"
+
+rule_files:
+  - /etc/prometheus/rules/common/*.yaml
+  - /etc/prometheus/rules/nonprod/*.yaml
+
+scrape_configs:
+  - job_name: "kubernetes-pods"
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: "true"
+
+  - job_name: "kubernetes-nodes"
+    scheme: https
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    kubernetes_sd_configs:
+      - role: node
+
+  - job_name: "node-exporter"
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_endpoints_name]
+        action: keep
+        regex: node-exporter
+
+remote_write:
+  - url: "http://localhost:8005/workspaces/NONPROD_WORKSPACE_ID/api/v1/remote_write"
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 200
+      capacity: 2500

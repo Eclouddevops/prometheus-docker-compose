@@ -1,0 +1,51 @@
+# Prometheus config for: counselling-prod (376129876930)
+# Region: us-east-1 | Environment: Production
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    account_id: "376129876930"
+    account_name: "counselling-prod"
+    environment: "production"
+    region: "us-east-1"
+    team: "counselling"
+    cluster: "counselling-prod-eks"
+
+rule_files:
+  - /etc/prometheus/rules/common/*.yaml
+  - /etc/prometheus/rules/prod/*.yaml
+
+scrape_configs:
+  - job_name: "kubernetes-pods"
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: "true"
+
+  - job_name: "node-exporter"
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_endpoints_name]
+        action: keep
+        regex: node-exporter
+
+  - job_name: "app-metrics"
+    static_configs:
+      - targets: []
+    kubernetes_sd_configs:
+      - role: service
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+        action: keep
+        regex: "true"
+
+remote_write:
+  - url: "http://localhost:8005/workspaces/PROD_WORKSPACE_ID/api/v1/remote_write"
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 200
+      capacity: 2500

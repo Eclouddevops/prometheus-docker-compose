@@ -1,0 +1,23 @@
+# AMP Workspace Definitions
+# Central Account: 426336593251 (Core_Account_SharedServices)
+
+workspaces:
+  nonprod:
+    alias: "central-nonprod-monitoring"
+    region: "us-east-1"
+    central_account_id: "426336593251"
+    description: "Centralized monitoring for all non-production AWS accounts"
+    tags:
+      Environment: nonprod
+      ManagedBy: terraform
+      Team: devops
+
+  prod:
+    alias: "central-prod-monitoring"
+    region: "ap-south-1"
+    central_account_id: "426336593251"
+    description: "Centralized monitoring for all production AWS accounts"
+    tags:
+      Environment: prod
+      ManagedBy: terraform
+      Team: devops

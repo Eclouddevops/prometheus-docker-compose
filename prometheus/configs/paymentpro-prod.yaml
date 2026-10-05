@@ -1,0 +1,51 @@
+# Prometheus config for: PaymentPro-Prod (503561424407)
+# Region: us-east-1 | Environment: Production
+# HIGH PRIORITY - Payment processing workloads
+
+global:
+  scrape_interval: 10s       # More frequent for payment workloads
+  evaluation_interval: 10s
+  external_labels:
+    account_id: "503561424407"
+    account_name: "paymentpro-prod"
+    environment: "production"
+    region: "us-east-1"
+    team: "paymentpro"
+    cluster: "paymentpro-prod-eks"
+    criticality: "high"
+
+rule_files:
+  - /etc/prometheus/rules/common/*.yaml
+  - /etc/prometheus/rules/prod/*.yaml
+
+scrape_configs:
+  - job_name: "kubernetes-pods"
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: "true"
+
+  - job_name: "payment-api"
+    kubernetes_sd_configs:
+      - role: service
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_label_app]
+        action: keep
+        regex: payment-.*
+
+  - job_name: "node-exporter"
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_endpoints_name]
+        action: keep
+        regex: node-exporter
+
+remote_write:
+  - url: "http://localhost:8005/workspaces/PROD_WORKSPACE_ID/api/v1/remote_write"
+    queue_config:
+      max_samples_per_send: 2000
+      max_shards: 200
+      capacity: 5000

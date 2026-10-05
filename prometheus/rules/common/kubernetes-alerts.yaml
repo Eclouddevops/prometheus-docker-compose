@@ -1,0 +1,66 @@
+groups:
+  - name: kubernetes.alerts
+    interval: 30s
+    rules:
+      - alert: PodCrashLooping
+        expr: rate(kube_pod_container_status_restarts_total[15m]) * 60 * 5 > 5
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Pod {{ $labels.pod }} is crash looping"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} in account {{ $labels.account_name }} ({{ $labels.environment }}) is restarting {{ $value }} times / 5 min"
+
+      - alert: PodNotReady
+        expr: kube_pod_status_phase{phase=~"Pending|Unknown"} > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod {{ $labels.pod }} not ready"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in {{ $labels.phase }} state for more than 10 minutes"
+
+      - alert: DeploymentReplicasMismatch
+        expr: kube_deployment_spec_replicas != kube_deployment_status_replicas_available
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Deployment {{ $labels.deployment }} replica mismatch"
+          description: "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has {{ $value }} replicas available but expected more"
+
+      - alert: ContainerOOMKilled
+        expr: kube_pod_container_status_last_terminated_reason{reason="OOMKilled"} > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container OOMKilled in {{ $labels.pod }}"
+          description: "Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} was OOM killed"
+
+      - alert: HighPodRestarts
+        expr: kube_pod_container_status_restarts_total > 10
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod {{ $labels.pod }} has high restart count"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has restarted {{ $value }} times"
+
+      - alert: NodeNotReady
+        expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kubernetes node {{ $labels.node }} not ready"
+          description: "Node {{ $labels.node }} in account {{ $labels.account_name }} has been unready for more than 5 minutes"
+
+      - alert: KubernetesPersistentVolumeFull
+        expr: kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes * 100 < 10
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PVC {{ $labels.persistentvolumeclaim }} nearly full"
+          description: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is {{ $value | printf \"%.2f\" }}% full"

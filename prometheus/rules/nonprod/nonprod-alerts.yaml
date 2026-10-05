@@ -1,0 +1,23 @@
+groups:
+  - name: nonprod.alerts
+    interval: 60s
+    rules:
+      - alert: NonProdHighCPU
+        expr: 100 - (avg by(instance, account_name) (rate(node_cpu_seconds_total{mode="idle", environment="nonprod"}[5m])) * 100) > 90
+        for: 10m
+        labels:
+          severity: warning
+          environment: nonprod
+        annotations:
+          summary: "High CPU in nonprod {{ $labels.account_name }}"
+          description: "CPU at {{ $value | printf \"%.2f\" }}% on {{ $labels.instance }}"
+
+      - alert: NonProdServiceDown
+        expr: up{environment="nonprod"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          environment: nonprod
+        annotations:
+          summary: "Service down in nonprod - {{ $labels.job }}"
+          description: "Service {{ $labels.job }} in account {{ $labels.account_name }} has been down for 5 minutes"

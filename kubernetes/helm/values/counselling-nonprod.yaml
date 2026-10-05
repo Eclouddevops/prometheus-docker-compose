@@ -1,0 +1,36 @@
+# Helm values for: counselling-nonprod (992382651259)
+# Region: us-east-1 | Environment: Non-Production
+
+account:
+  id: "992382651259"
+  name: "counselling-nonprod"
+  environment: "nonprod"
+  region: "us-east-1"
+  team: "counselling"
+
+amp:
+  workspaceId: "NONPROD_WORKSPACE_ID"
+  region: "us-east-1"
+  centralAccountId: "426336593251"
+  crossAccountRoleArn: "arn:aws:iam::426336593251:role/AMP-CrossAccount-RemoteWrite"
+
+serviceAccount:
+  name: amp-sa
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::992382651259:role/AMP-RemoteWrite-Role"
+
+sigv4proxy:
+  image: public.ecr.aws/aws-observability/aws-sigv4-proxy:latest
+  port: 8005
+
+prometheus:
+  scrapeInterval: "30s"
+  evaluationInterval: "30s"
+  retention: "1d"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi

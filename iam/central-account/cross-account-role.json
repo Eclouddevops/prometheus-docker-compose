@@ -1,0 +1,66 @@
+{
+  "RoleName": "AMP-CrossAccount-RemoteWrite",
+  "Description": "Allows all source AWS accounts to send metrics to central AMP workspace",
+  "TrustPolicy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AllowSourceAccountsToAssume",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": [
+            "arn:aws:iam::840066156479:root",
+            "arn:aws:iam::814167067247:root",
+            "arn:aws:iam::194374732776:root",
+            "arn:aws:iam::986788162487:root",
+            "arn:aws:iam::376129876930:root",
+            "arn:aws:iam::484021612095:root",
+            "arn:aws:iam::503561424407:root",
+            "arn:aws:iam::573811483933:root",
+            "arn:aws:iam::039138653430:root",
+            "arn:aws:iam::596338505229:root",
+            "arn:aws:iam::579286803788:root",
+            "arn:aws:iam::081027471069:root",
+            "arn:aws:iam::509235756237:root",
+            "arn:aws:iam::228227093546:root",
+            "arn:aws:iam::992382651259:root",
+            "arn:aws:iam::337909775485:root",
+            "arn:aws:iam::243244970719:root",
+            "arn:aws:iam::025688828853:root",
+            "arn:aws:iam::248189944202:root",
+            "arn:aws:iam::196252597537:root",
+            "arn:aws:iam::713678752742:root",
+            "arn:aws:iam::343268907886:root",
+            "arn:aws:iam::316929918327:root",
+            "arn:aws:iam::903001346340:root",
+            "arn:aws:iam::652892608280:root",
+            "arn:aws:iam::226563001214:root",
+            "arn:aws:iam::734352162710:root",
+            "arn:aws:iam::884614646509:root",
+            "arn:aws:iam::441508417985:root",
+            "arn:aws:iam::560885581232:root",
+            "arn:aws:iam::968311652915:root"
+          ]
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  },
+  "PermissionPolicy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AMPRemoteWrite",
+        "Effect": "Allow",
+        "Action": [
+          "aps:RemoteWrite",
+          "aps:GetSeries",
+          "aps:GetLabels",
+          "aps:GetMetricMetadata",
+          "aps:QueryMetrics"
+        ],
+        "Resource": "*"
+      }
+    ]
+  }
+}

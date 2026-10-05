@@ -1,0 +1,44 @@
+groups:
+  - name: production.alerts
+    interval: 15s
+    rules:
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status=~"5..", environment="production"}[5m])) by (service, account_name) / sum(rate(http_requests_total{environment="production"}[5m])) by (service, account_name) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          environment: production
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "Service {{ $labels.service }} in {{ $labels.account_name }} has {{ $value | printf \"%.2f\" }}% error rate"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{environment="production"}[5m])) by (le, service, account_name)) > 2
+        for: 5m
+        labels:
+          severity: warning
+          environment: production
+        annotations:
+          summary: "High latency on {{ $labels.service }}"
+          description: "99th percentile latency for {{ $labels.service }} in {{ $labels.account_name }} is {{ $value }}s"
+
+      - alert: ServiceDown
+        expr: up{environment="production"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          environment: production
+        annotations:
+          summary: "Service {{ $labels.job }} is DOWN in PRODUCTION"
+          description: "Service {{ $labels.job }} in account {{ $labels.account_name }} ({{ $labels.region }}) has been down for more than 1 minute - PRODUCTION IMPACT"
+
+      - alert: PaymentServiceDown
+        expr: up{account_name=~"paymentpro-.*", environment="production"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          team: paymentpro
+          pagerduty: "true"
+        annotations:
+          summary: "🚨 CRITICAL: PaymentPro service down in PRODUCTION"
+          description: "Payment service {{ $labels.job }} in {{ $labels.account_name }} is DOWN - Immediate action required!"

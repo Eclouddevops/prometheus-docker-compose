@@ -1,0 +1,48 @@
+# Helm values for: core-prod-workload (986788162487)
+# Region: ap-south-1 | Cluster: core-prod-workload-eks
+
+account:
+  id: "986788162487"
+  name: "core-prod-workload"
+  environment: "production"
+  region: "ap-south-1"
+  team: "core"
+
+amp:
+  workspaceId: "PROD_WORKSPACE_ID"       # Replace with actual workspace ID
+  region: "ap-south-1"
+  centralAccountId: "426336593251"
+  crossAccountRoleArn: "arn:aws:iam::426336593251:role/AMP-CrossAccount-RemoteWrite"
+
+serviceAccount:
+  name: amp-sa
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::986788162487:role/AMP-RemoteWrite-Role"
+
+sigv4proxy:
+  image: public.ecr.aws/aws-observability/aws-sigv4-proxy:latest
+  port: 8005
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+prometheus:
+  scrapeInterval: "15s"
+  evaluationInterval: "15s"
+  retention: "1d"
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  remoteWrite:
+    queueConfig:
+      maxSamplesPerSend: 1000
+      maxShards: 200
+      capacity: 2500
