@@ -1,0 +1,11 @@
+apiVersion: v2
+name: prometheus-amp
+description: Prometheus with AWS SigV4 proxy for AMP cross-account metrics shipping
+type: application
+version: 1.0.0
+appVersion: "2.47.0"
+
+dependencies:
+  - name: prometheus
+    version: "25.x.x"
+    repository: "https://prometheus-community.github.io/helm-charts"

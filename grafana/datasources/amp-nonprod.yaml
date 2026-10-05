@@ -1,0 +1,25 @@
+apiVersion: 1
+datasources:
+  - name: AMP-NonProd
+    type: prometheus
+    url: https://aps-workspaces.us-east-1.amazonaws.com/workspaces/NONPROD_WORKSPACE_ID
+    access: proxy
+    isDefault: false
+    jsonData:
+      sigV4Auth: true
+      sigV4AuthType: default
+      sigV4Region: us-east-1
+    secureJsonData: {}
+    editable: true
+
+  - name: AMP-Prod
+    type: prometheus
+    url: https://aps-workspaces.ap-south-1.amazonaws.com/workspaces/PROD_WORKSPACE_ID
+    access: proxy
+    isDefault: true
+    jsonData:
+      sigV4Auth: true
+      sigV4AuthType: default
+      sigV4Region: ap-south-1
+    secureJsonData: {}
+    editable: true
